@@ -38,6 +38,9 @@ public class ParkOwnerController {
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "20") Integer pageSize,
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String ownerName,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String idCard,
             @RequestParam(required = false) Integer ownerType,
             @RequestParam(required = false) Integer occupancyStatus,
             @RequestParam(required = false) Integer authStatus,
@@ -48,8 +51,18 @@ public class ParkOwnerController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate moveInEndDate,
             @RequestParam(required = false) String sortField,
             @RequestParam(required = false) String sortOrder) {
+        String searchKeyword = keyword;
+        if (searchKeyword == null || searchKeyword.isEmpty()) {
+            if (ownerName != null && !ownerName.isEmpty()) {
+                searchKeyword = ownerName;
+            } else if (phone != null && !phone.isEmpty()) {
+                searchKeyword = phone;
+            } else if (idCard != null && !idCard.isEmpty()) {
+                searchKeyword = idCard;
+            }
+        }
         PageResult<ParkOwner> result = parkOwnerService.pageList(
-                pageNum, pageSize, keyword, ownerType, occupancyStatus, authStatus,
+                pageNum, pageSize, searchKeyword, ownerType, occupancyStatus, authStatus,
                 ownerTags, minPropertyCount, maxPropertyCount, moveInStartDate, moveInEndDate,
                 sortField, sortOrder);
         return Result.success(result);
@@ -77,6 +90,9 @@ public class ParkOwnerController {
         } catch (Exception ignored) {}
 
         Map<String, Object> ownerMap = (Map<String, Object>) params.get("owner");
+        if (ownerMap == null) {
+            ownerMap = params;
+        }
         List<Map<String, Object>> propertyListMap = (List<Map<String, Object>>) params.get("propertyList");
 
         ParkOwner owner = convertMapToOwner(ownerMap);
@@ -143,7 +159,7 @@ public class ParkOwnerController {
 
     @PostMapping("/bindProperty")
     @PreAuthorize("hasAuthority('park:owner:bindProperty')")
-    public Result<Void> bindProperty(@RequestBody ParkOwnerProperty propertyRelation) {
+    public Result<Void> bindProperty(@RequestBody Map<String, Object> params) {
         Long operatorId = null;
         String operatorName = null;
         try {
@@ -154,6 +170,14 @@ public class ParkOwnerController {
                 operatorName = loginUser.getUser() != null ? loginUser.getUser().getNickname() : loginUser.getUsername();
             }
         } catch (Exception ignored) {}
+
+        ParkOwnerProperty propertyRelation = convertMapToOwnerProperty(params);
+        if (propertyRelation.getOwnerId() == null) {
+            return Result.error("业主ID不能为空");
+        }
+        if (propertyRelation.getPropertyId() == null) {
+            return Result.error("房产ID不能为空");
+        }
 
         ParkOwner owner = parkOwnerService.getById(propertyRelation.getOwnerId());
         if (owner == null) {
@@ -168,7 +192,17 @@ public class ParkOwnerController {
     @PostMapping("/unbindProperty")
     @PreAuthorize("hasAuthority('park:owner:unbindProperty')")
     public Result<Void> unbindProperty(@RequestBody Map<String, Object> params) {
-        Long relationId = Long.valueOf(params.get("relationId").toString());
+        Long relationId = null;
+        if (params.get("relationId") != null) {
+            relationId = Long.valueOf(params.get("relationId").toString());
+        } else if (params.get("propertyId") != null) {
+            relationId = Long.valueOf(params.get("propertyId").toString());
+        } else if (params.get("id") != null) {
+            relationId = Long.valueOf(params.get("id").toString());
+        }
+        if (relationId == null) {
+            return Result.error("关联ID不能为空");
+        }
         String unbindReason = params.get("unbindReason") != null ? params.get("unbindReason").toString() : null;
 
         Long operatorId = null;
@@ -245,12 +279,25 @@ public class ParkOwnerController {
     @PreAuthorize("hasAuthority('park:owner:export')")
     public Result<List<ParkOwner>> export(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String ownerName,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String idCard,
             @RequestParam(required = false) Integer ownerType,
             @RequestParam(required = false) Integer occupancyStatus,
             @RequestParam(required = false) Integer authStatus,
             @RequestParam(required = false) String ownerTags) {
+        String searchKeyword = keyword;
+        if (searchKeyword == null || searchKeyword.isEmpty()) {
+            if (ownerName != null && !ownerName.isEmpty()) {
+                searchKeyword = ownerName;
+            } else if (phone != null && !phone.isEmpty()) {
+                searchKeyword = phone;
+            } else if (idCard != null && !idCard.isEmpty()) {
+                searchKeyword = idCard;
+            }
+        }
         List<ParkOwner> list = parkOwnerService.listAllForExport(
-                keyword, ownerType, occupancyStatus, authStatus, ownerTags);
+                searchKeyword, ownerType, occupancyStatus, authStatus, ownerTags);
         return Result.success(list);
     }
 
@@ -258,6 +305,7 @@ public class ParkOwnerController {
         ParkOwner owner = new ParkOwner();
         if (map.get("ownerType") != null) owner.setOwnerType(Integer.valueOf(map.get("ownerType").toString()));
         if (map.get("name") != null) owner.setName(map.get("name").toString());
+        else if (map.get("ownerName") != null) owner.setName(map.get("ownerName").toString());
         if (map.get("gender") != null) owner.setGender(Integer.valueOf(map.get("gender").toString()));
         if (map.get("idCard") != null) owner.setIdCard(map.get("idCard").toString());
         if (map.get("birthDate") != null) owner.setBirthDate(LocalDate.parse(map.get("birthDate").toString()));
@@ -293,9 +341,12 @@ public class ParkOwnerController {
 
     private ParkOwnerProperty convertMapToOwnerProperty(Map<String, Object> map) {
         ParkOwnerProperty op = new ParkOwnerProperty();
+        if (map.get("ownerId") != null) op.setOwnerId(Long.valueOf(map.get("ownerId").toString()));
         if (map.get("propertyId") != null) op.setPropertyId(Long.valueOf(map.get("propertyId").toString()));
         if (map.get("propertyRightType") != null) op.setPropertyRightType(Integer.valueOf(map.get("propertyRightType").toString()));
+        else if (map.get("ownershipType") != null) op.setPropertyRightType(Integer.valueOf(map.get("ownershipType").toString()));
         if (map.get("propertyRightRatio") != null) op.setPropertyRightRatio(new java.math.BigDecimal(map.get("propertyRightRatio").toString()));
+        else if (map.get("ownershipRatio") != null) op.setPropertyRightRatio(new java.math.BigDecimal(map.get("ownershipRatio").toString()));
         if (map.get("propertyCertNo") != null) op.setPropertyCertNo(map.get("propertyCertNo").toString());
         if (map.get("acquireType") != null) op.setAcquireType(Integer.valueOf(map.get("acquireType").toString()));
         if (map.get("acquireDate") != null) op.setAcquireDate(LocalDate.parse(map.get("acquireDate").toString()));

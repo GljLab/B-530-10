@@ -22,20 +22,20 @@
         </el-col>
         <el-col :span="4">
           <div class="stat-item">
-            <div class="stat-value info">{{ stats.auditedCount || 0 }}</div>
+            <div class="stat-value info">{{ stats.authPassedCount || 0 }}</div>
             <div class="stat-label">已认证</div>
           </div>
         </el-col>
         <el-col :span="4">
           <div class="stat-item">
-            <div class="stat-value" style="color: #F56C6C;">{{ stats.pendingAuditCount || 0 }}</div>
+            <div class="stat-value" style="color: #F56C6C;">{{ stats.authPendingCount || 0 }}</div>
             <div class="stat-label">待审核</div>
           </div>
         </el-col>
         <el-col :span="4">
           <div class="stat-item">
-            <div class="stat-value" style="color: #909399;">{{ stats.propertyCount || 0 }}</div>
-            <div class="stat-label">关联房产</div>
+            <div class="stat-value" style="color: #909399;">{{ stats.avgPropertyCount ? stats.avgPropertyCount.toFixed(1) : '0' }}</div>
+            <div class="stat-label">户均房产</div>
           </div>
         </el-col>
       </el-row>
@@ -59,11 +59,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="认证状态">
-          <el-select v-model="queryForm.auditStatus" placeholder="全部" clearable style="width: 120px;">
-            <el-option label="未认证" :value="0" />
-            <el-option label="待审核" :value="1" />
-            <el-option label="已通过" :value="2" />
-            <el-option label="已拒绝" :value="3" />
+          <el-select v-model="queryForm.authStatus" placeholder="全部" clearable style="width: 120px;">
+            <el-option label="未认证" :value="1" />
+            <el-option label="已认证" :value="2" />
+            <el-option label="认证失败" :value="3" />
           </el-select>
         </el-form-item>
         <el-form-item label="房产编号">
@@ -108,15 +107,15 @@
         stripe
         @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="ownerName" label="业主姓名" width="120">
+        <el-table-column prop="name" label="业主姓名" width="120">
           <template #default="{ row }">
-            <el-link type="primary" @click="handleView(row)">{{ row.ownerName }}</el-link>
+            <el-link type="primary" @click="handleView(row)">{{ row.name || '-' }}</el-link>
           </template>
         </el-table-column>
         <el-table-column label="类型" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.ownerType === 1 ? 'primary' : 'warning'" size="small">
-              {{ row.ownerType === 1 ? '个人' : '企业' }}
+            <el-tag :type="row.ownerType === 1 ? 'primary' : (row.ownerType === 2 ? 'warning' : 'success')" size="small">
+              {{ row.ownerType === 1 ? '个人' : (row.ownerType === 2 ? '企业' : '投资') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -128,8 +127,15 @@
         </el-table-column>
         <el-table-column label="认证状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getAuditTagType(row.auditStatus)" size="small">
-              {{ getAuditStatusLabel(row.auditStatus) }}
+            <el-tag :type="getAuditTagType(row.authStatus)" size="small">
+              {{ getAuditStatusLabel(row.authStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="入住状态" width="100">
+          <template #default="{ row }">
+            <el-tag size="small" :type="row.occupancyStatus === 1 ? 'success' : (row.occupancyStatus === 2 ? 'info' : 'warning')">
+              {{ row.occupancyStatus === 1 ? '已入住' : (row.occupancyStatus === 2 ? '未入住' : '委托出租') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -138,12 +144,12 @@
             <el-tag type="info" size="small">{{ row.propertyCount || 0 }}套</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="注册时间" width="160" />
+        <el-table-column prop="ownerCode" label="业主编号" width="120" />
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">详情</el-button>
             <el-button v-if="hasEditPermission" type="success" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button v-if="hasAuditPermission && row.auditStatus === 1" type="warning" size="small" @click="handleAudit(row)">审核</el-button>
+            <el-button v-if="hasAuditPermission && row.authStatus === 1" type="warning" size="small" @click="handleAudit(row)">审核</el-button>
             <el-button v-if="hasDeletePermission" type="danger" size="small" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -163,11 +169,14 @@
     <el-dialog v-model="auditDialogVisible" title="审核业主" width="500px">
       <el-form label-width="100px">
         <el-form-item label="业主姓名">
-          <span>{{ currentOwner?.ownerName }}</span>
+          <span>{{ currentOwner?.name }}</span>
+        </el-form-item>
+        <el-form-item label="业主编号">
+          <span>{{ currentOwner?.ownerCode }}</span>
         </el-form-item>
         <el-form-item label="当前状态">
-          <el-tag :type="getAuditTagType(currentOwner?.auditStatus)">
-            {{ getAuditStatusLabel(currentOwner?.auditStatus) }}
+          <el-tag :type="getAuditTagType(currentOwner?.authStatus)">
+            {{ getAuditStatusLabel(currentOwner?.authStatus) }}
           </el-tag>
         </el-form-item>
         <el-form-item label="审核结果">
@@ -330,18 +339,16 @@ function formatIdCard(idCard) {
 
 function getAuditStatusLabel(status) {
   const map = {
-    0: '未认证',
-    1: '待审核',
-    2: '已通过',
-    3: '已拒绝'
+    1: '未认证',
+    2: '已认证',
+    3: '认证失败'
   }
   return map[status] || '-'
 }
 
 function getAuditTagType(status) {
   const map = {
-    0: 'info',
-    1: 'warning',
+    1: 'info',
     2: 'success',
     3: 'danger'
   }
@@ -391,7 +398,7 @@ function handleEdit(row) {
 }
 
 function handleDelete(row) {
-  ElMessageBox.confirm(`确定要删除业主 "${row.ownerName}" 吗？`, '提示', {
+  ElMessageBox.confirm(`确定要删除业主 "${row.name || row.ownerCode}" 吗？`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
@@ -417,9 +424,10 @@ function confirmAudit() {
     return
   }
   api.parkOwner.audit({
-    id: currentOwner.value.id,
-    auditStatus: auditResult.value,
-    auditRemark: auditRemark.value
+    ownerId: currentOwner.value.id,
+    auditResult: auditResult.value,
+    auditOpinion: auditRemark.value,
+    rejectReason: auditResult.value === 3 ? auditRemark.value : null
   }).then(() => {
     ElMessage.success('审核完成')
     auditDialogVisible.value = false
@@ -511,19 +519,21 @@ function handleExport() {
 }
 
 function exportToCSV(data) {
-  const headers = ['业主姓名', '业主类型', '联系电话', '证件号码', '认证状态', '关联房产数', '注册时间', '备注']
+  const headers = ['业主编号', '业主姓名', '业主类型', '联系电话', '证件号码', '认证状态', '入住状态', '关联房产数', '备注']
   
-  const typeMap = { 1: '个人', 2: '企业' }
-  const statusMap = { 0: '未认证', 1: '待审核', 2: '已通过', 3: '已拒绝' }
+  const typeMap = { 1: '个人业主', 2: '企业业主', 3: '投资业主' }
+  const authStatusMap = { 1: '未认证', 2: '已认证', 3: '认证失败' }
+  const occupancyMap = { 1: '已入住', 2: '未入住', 3: '委托出租' }
   
   const rows = data.map(item => [
-    item.ownerName,
+    item.ownerCode || '',
+    item.name || '',
     typeMap[item.ownerType] || '',
-    item.phone,
-    item.idCard,
-    statusMap[item.auditStatus] || '',
+    item.phone || '',
+    item.idCard || '',
+    authStatusMap[item.authStatus] || '',
+    occupancyMap[item.occupancyStatus] || '',
     item.propertyCount || 0,
-    item.createTime || '',
     item.remark || ''
   ])
   

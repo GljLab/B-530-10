@@ -16,11 +16,11 @@
       <el-steps :active="activeStep" finish-status="success" align-center>
         <el-step title="选择业主类型" />
         <el-step :title="formData.ownerType === 1 ? '个人信息' : '企业信息'" />
-        <el-step title="联系信息" />
-        <el-step title="关联房产" />
+        <el-step title="联系与地址信息" />
+        <el-step title="关联房产（可选）" />
       </el-steps>
 
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="120px" class="form-content">
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="130px" class="form-content">
         <div v-if="activeStep === 0" class="step-content">
           <div class="type-selector">
             <div 
@@ -46,8 +46,8 @@
           <div v-if="formData.ownerType === 1">
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="业主姓名" prop="ownerName">
-                  <el-input v-model="formData.ownerName" placeholder="请输入业主姓名" />
+                <el-form-item label="业主姓名" prop="name">
+                  <el-input v-model="formData.name" placeholder="请输入业主姓名" maxlength="50" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -61,105 +61,106 @@
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="证件类型" prop="idCardType">
-                  <el-select v-model="formData.idCardType" placeholder="请选择证件类型" style="width: 100%;">
-                    <el-option label="身份证" value="身份证" />
-                    <el-option label="护照" value="护照" />
-                    <el-option label="港澳通行证" value="港澳通行证" />
-                    <el-option label="台胞证" value="台胞证" />
-                    <el-option label="其他" value="其他" />
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
                 <el-form-item label="证件号码" prop="idCard">
-                  <el-input v-model="formData.idCard" placeholder="请输入证件号码" />
+                  <el-input v-model="formData.idCard" placeholder="请输入身份证号码" maxlength="18" />
                 </el-form-item>
               </el-col>
-            </el-row>
-            <el-row :gutter="20">
               <el-col :span="12">
                 <el-form-item label="出生日期" prop="birthDate">
                   <el-date-picker 
                     v-model="formData.birthDate" 
                     type="date" 
+                    value-format="YYYY-MM-DD"
                     placeholder="选择出生日期" 
                     style="width: 100%;" />
                 </el-form-item>
               </el-col>
+            </el-row>
+            <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="学历" prop="education">
-                  <el-select v-model="formData.education" placeholder="请选择学历" clearable style="width: 100%;">
-                    <el-option label="小学" value="小学" />
-                    <el-option label="初中" value="初中" />
-                    <el-option label="高中" value="高中" />
-                    <el-option label="大专" value="大专" />
-                    <el-option label="本科" value="本科" />
-                    <el-option label="硕士" value="硕士" />
-                    <el-option label="博士" value="博士" />
+                <el-form-item label="民族">
+                  <el-input v-model="formData.nation" placeholder="请输入民族，如汉族" clearable maxlength="20" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="婚姻状况">
+                  <el-select v-model="formData.maritalStatus" placeholder="请选择婚姻状况" clearable style="width: 100%;">
+                    <el-option label="未婚" :value="1" />
+                    <el-option label="已婚" :value="2" />
+                    <el-option label="离异" :value="3" />
+                    <el-option label="丧偶" :value="4" />
                   </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="职业" prop="occupation">
-                  <el-input v-model="formData.occupation" placeholder="请输入职业" clearable />
+                <el-form-item label="职业">
+                  <el-input v-model="formData.occupation" placeholder="请输入职业" clearable maxlength="50" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="工作单位" prop="workUnit">
-                  <el-input v-model="formData.workUnit" placeholder="请输入工作单位" clearable />
+                <el-form-item label="工作单位">
+                  <el-input v-model="formData.workUnit" placeholder="请输入工作单位" clearable maxlength="100" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="紧急联系人" prop="emergencyContact">
-                  <el-input v-model="formData.emergencyContact" placeholder="请输入紧急联系人" clearable />
+                <el-form-item label="紧急联系人">
+                  <el-input v-model="formData.emergencyContact" placeholder="请输入紧急联系人" clearable maxlength="50" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="紧急联系电话" prop="emergencyPhone">
-                  <el-input v-model="formData.emergencyPhone" placeholder="请输入紧急联系电话" clearable />
+                <el-form-item label="紧急联系电话">
+                  <el-input v-model="formData.emergencyPhone" placeholder="请输入紧急联系电话" clearable maxlength="11" />
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="与紧急联系人关系" prop="emergencyRelation">
-              <el-select v-model="formData.emergencyRelation" placeholder="请选择关系" clearable style="width: 100%;">
-                <el-option label="配偶" value="配偶" />
-                <el-option label="父母" value="父母" />
-                <el-option label="子女" value="子女" />
-                <el-option label="兄弟姐妹" value="兄弟姐妹" />
-                <el-option label="朋友" value="朋友" />
-                <el-option label="同事" value="同事" />
-                <el-option label="其他" value="其他" />
-              </el-select>
-            </el-form-item>
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="与紧急联系人关系">
+                  <el-select v-model="formData.emergencyRelation" placeholder="请选择关系" clearable style="width: 100%;">
+                    <el-option label="配偶" :value="1" />
+                    <el-option label="父母" :value="2" />
+                    <el-option label="子女" :value="3" />
+                    <el-option label="兄弟姐妹" :value="4" />
+                    <el-option label="朋友" :value="5" />
+                    <el-option label="同事" :value="6" />
+                    <el-option label="其他" :value="99" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="家庭人口数">
+                  <el-input-number v-model="formData.familyCount" :min="1" :max="20" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+            </el-row>
           </div>
 
           <div v-else>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="企业名称" prop="enterpriseName">
-                  <el-input v-model="formData.enterpriseName" placeholder="请输入企业名称" />
+                <el-form-item label="企业名称" prop="name">
+                  <el-input v-model="formData.name" placeholder="请输入企业名称" maxlength="100" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="统一社会信用代码" prop="creditCode">
-                  <el-input v-model="formData.creditCode" placeholder="请输入统一社会信用代码" />
+                <el-form-item label="统一社会信用代码" prop="enterpriseCreditCode">
+                  <el-input v-model="formData.enterpriseCreditCode" placeholder="请输入18位统一社会信用代码" maxlength="18" />
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="法定代表人" prop="legalPerson">
-                  <el-input v-model="formData.legalPerson" placeholder="请输入法定代表人姓名" />
+                <el-form-item label="法定代表人" prop="legalPersonName">
+                  <el-input v-model="formData.legalPersonName" placeholder="请输入法定代表人姓名" maxlength="50" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="法人证件号" prop="legalPersonIdCard">
-                  <el-input v-model="formData.legalPersonIdCard" placeholder="请输入法人证件号" clearable />
+                <el-form-item label="法人身份证号">
+                  <el-input v-model="formData.legalPersonIdCard" placeholder="请输入法人身份证号" clearable maxlength="18" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -167,45 +168,52 @@
               <el-col :span="12">
                 <el-form-item label="企业类型" prop="enterpriseType">
                   <el-select v-model="formData.enterpriseType" placeholder="请选择企业类型" clearable style="width: 100%;">
-                    <el-option label="国有企业" value="国有企业" />
-                    <el-option label="集体企业" value="集体企业" />
-                    <el-option label="私营企业" value="私营企业" />
-                    <el-option label="联营企业" value="联营企业" />
-                    <el-option label="股份制企业" value="股份制企业" />
-                    <el-option label="外商投资企业" value="外商投资企业" />
-                    <el-option label="其他" value="其他" />
+                    <el-option label="国有企业" :value="1" />
+                    <el-option label="集体企业" :value="2" />
+                    <el-option label="私营企业" :value="3" />
+                    <el-option label="联营企业" :value="4" />
+                    <el-option label="股份制企业" :value="5" />
+                    <el-option label="外商投资企业" :value="6" />
+                    <el-option label="有限责任公司" :value="7" />
+                    <el-option label="股份有限公司" :value="8" />
+                    <el-option label="个体工商户" :value="9" />
+                    <el-option label="其他" :value="99" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="注册资本" prop="registeredCapital">
-                  <el-input v-model="formData.registeredCapital" placeholder="请输入注册资本" clearable>
-                    <template #append>万元</template>
-                  </el-input>
+                <el-form-item label="注册资本">
+                  <el-input-number v-model="formData.registeredCapital" :min="0" :precision="2" style="width: 100%;" />
+                  <div style="font-size: 12px; color: #909399; margin-top: 4px;">单位：万元</div>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-form-item label="成立日期" prop="establishDate">
-                  <el-date-picker 
-                    v-model="formData.establishDate" 
-                    type="date" 
-                    placeholder="选择成立日期" 
-                    style="width: 100%;" />
+                <el-form-item label="联系人">
+                  <el-input v-model="formData.contactPerson" placeholder="请输入联系人姓名" clearable maxlength="50" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="联系人" prop="contactPerson">
-                  <el-input v-model="formData.contactPerson" placeholder="请输入联系人姓名" />
+                <el-form-item label="联系人职务">
+                  <el-input v-model="formData.contactPosition" placeholder="如经理、行政专员等" clearable maxlength="50" />
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="经营范围" prop="businessScope">
-              <el-input v-model="formData.businessScope" type="textarea" :rows="3" placeholder="请输入经营范围" clearable />
-            </el-form-item>
-            <el-form-item label="注册地址" prop="registeredAddress">
-              <el-input v-model="formData.registeredAddress" type="textarea" :rows="2" placeholder="请输入注册地址" clearable />
+            <el-row :gutter="20">
+              <el-col :span="12">
+                <el-form-item label="联系人电话">
+                  <el-input v-model="formData.contactPhone" placeholder="请输入联系人手机号" clearable maxlength="11" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="行业">
+                  <el-input v-model="formData.industry" placeholder="如房地产、科技、教育等" clearable maxlength="50" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item label="企业地址">
+              <el-input v-model="formData.enterpriseAddress" type="textarea" :rows="2" placeholder="请输入企业实际办公/注册地址" maxlength="500" />
             </el-form-item>
           </div>
         </div>
@@ -214,70 +222,90 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="联系电话" prop="phone">
-                <el-input v-model="formData.phone" placeholder="请输入联系电话" />
+                <el-input v-model="formData.phone" placeholder="请输入联系电话（必填）" maxlength="11" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="电子邮箱" prop="email">
-                <el-input v-model="formData.email" placeholder="请输入电子邮箱" clearable />
+              <el-form-item label="备用手机">
+                <el-input v-model="formData.backupPhone" placeholder="请输入备用手机（可选）" clearable maxlength="11" />
               </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="微信号" prop="wechat">
-                <el-input v-model="formData.wechat" placeholder="请输入微信号" clearable />
+              <el-form-item label="电子邮箱">
+                <el-input v-model="formData.email" placeholder="请输入电子邮箱（可选）" clearable maxlength="100" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="QQ号" prop="qq">
-                <el-input v-model="formData.qq" placeholder="请输入QQ号" clearable />
+              <el-form-item label="微信号">
+                <el-input v-model="formData.wechat" placeholder="请输入微信号（可选）" clearable maxlength="50" />
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="联系地址" prop="address">
-            <el-input v-model="formData.address" type="textarea" :rows="2" placeholder="请输入联系地址" />
+          <el-form-item label="户籍地址">
+            <el-input v-model="formData.householdAddress" type="textarea" :rows="2" placeholder="请输入户籍/注册地址（可选）" maxlength="500" />
           </el-form-item>
-          <el-form-item label="备注" prop="remark">
-            <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注信息" clearable />
+          <el-form-item label="现居住地址（联系地址）" prop="currentAddress">
+            <el-input v-model="formData.currentAddress" type="textarea" :rows="2" placeholder="请输入现居住/联系地址（必填）" maxlength="500" />
+          </el-form-item>
+          <el-form-item label="入住状态">
+            <el-radio-group v-model="formData.occupancyStatus">
+              <el-radio :value="1">已入住</el-radio>
+              <el-radio :value="2">未入住</el-radio>
+              <el-radio :value="3">出租中</el-radio>
+              <el-radio :value="4">空置</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="备注信息">
+            <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注信息（可选）" maxlength="500" />
           </el-form-item>
         </div>
 
         <div v-if="activeStep === 3" class="step-content">
           <div class="property-select-header">
-            <span>选择关联房产（可选）</span>
+            <span>选择关联房产（可在详情页后续管理）</span>
             <el-button type="primary" size="small" @click="handleAddProperty">
               <el-icon><Plus /></el-icon>添加房产
             </el-button>
           </div>
           <el-table :data="selectedProperties" border stripe style="margin-top: 15px;">
-            <el-table-column prop="propertyCode" label="房产编号" width="120" />
+            <el-table-column prop="propertyCode" label="房产编号" width="130" />
             <el-table-column prop="buildingName" label="楼宇" width="120" />
             <el-table-column prop="floorNumber" label="楼层" width="80" />
-            <el-table-column prop="buildingArea" label="建筑面积(㎡)" width="120" />
-            <el-table-column label="产权比例" width="150">
+            <el-table-column prop="buildingArea" label="建筑面积(㎡)" width="110" />
+            <el-table-column prop="houseType" label="户型" width="90" />
+            <el-table-column label="产权关系" width="130">
               <template #default="{ row }">
-                <el-input-number v-model="row.ownershipRatio" :min="1" :max="100" size="small" />
-                <span style="margin-left: 5px;">%</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="共有方式" width="180">
-              <template #default="{ row }">
-                <el-select v-model="row.ownershipType" size="small" style="width: 100%;">
-                  <el-option label="单独所有" :value="1" />
-                  <el-option label="共同共有" :value="2" />
-                  <el-option label="按份共有" :value="3" />
+                <el-select v-model="row.propertyRightType" size="small" style="width: 100%;">
+                  <el-option label="完全产权" :value="1" />
+                  <el-option label="共有产权" :value="2" />
+                  <el-option label="使用权" :value="3" />
                 </el-select>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="100">
+            <el-table-column label="产权比例" width="120">
+              <template #default="{ row }">
+                <el-input-number v-if="row.propertyRightType === 2" v-model="row.propertyRightRatio" :min="1" :max="100" size="small" />
+                <span v-else style="color: #606266;">100%</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="是否自住" width="110">
+              <template #default="{ row }">
+                <el-radio-group v-model="row.isSelfOccupy" size="small">
+                  <el-radio :value="1">自住</el-radio>
+                  <el-radio :value="0">非自住</el-radio>
+                </el-radio-group>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="80">
               <template #default="{ $index }">
-                <el-button type="danger" size="small" @click="handleRemoveProperty($index)">删除</el-button>
+                <el-button type="danger" size="small" text @click="handleRemoveProperty($index)">移除</el-button>
               </template>
             </el-table-column>
           </el-table>
           <div v-if="selectedProperties.length === 0" class="empty-tip">
-            暂无关联房产，可点击"添加房产"按钮进行关联
+            暂未关联房产，可点击上方"添加房产"按钮选择房产，或提交后在业主详情页管理
           </div>
         </div>
       </el-form>
@@ -286,11 +314,11 @@
         <el-button @click="handleBack">取消</el-button>
         <el-button v-if="activeStep > 0" @click="prevStep">上一步</el-button>
         <el-button v-if="activeStep < 3" type="primary" @click="nextStep">下一步</el-button>
-        <el-button v-if="activeStep === 3" type="primary" @click="handleSubmit">提交</el-button>
+        <el-button v-if="activeStep === 3" type="primary" @click="handleSubmit">{{ isEdit ? '保存修改' : '提交新增' }}</el-button>
       </div>
     </el-card>
 
-    <el-dialog v-model="propertyDialogVisible" title="选择房产" width="800px">
+    <el-dialog v-model="propertyDialogVisible" title="选择房产" width="900px">
       <el-form :inline="true" :model="propertyQuery" size="default">
         <el-form-item label="房产编号">
           <el-input v-model="propertyQuery.propertyCode" placeholder="请输入" clearable @keyup.enter="searchProperty" />
@@ -310,19 +338,20 @@
         :data="propertyList" 
         border 
         stripe 
-        height="300"
+        height="360"
         @selection-change="handlePropertySelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="propertyCode" label="房产编号" width="120" />
-        <el-table-column prop="buildingName" label="楼宇" width="120" />
-        <el-table-column prop="floorNumber" label="楼层" width="80" />
-        <el-table-column prop="buildingArea" label="建筑面积(㎡)" width="120" />
-        <el-table-column prop="houseType" label="户型" width="100" />
-        <el-table-column label="状态" width="100">
+        <el-table-column prop="buildingName" label="楼宇" width="110" />
+        <el-table-column prop="floorNumber" label="楼层" width="70" />
+        <el-table-column prop="houseNo" label="房号" width="80" />
+        <el-table-column prop="buildingArea" label="建筑面积(㎡)" width="110" />
+        <el-table-column prop="useArea" label="使用面积(㎡)" width="110" />
+        <el-table-column prop="houseType" label="户型" width="80" />
+        <el-table-column prop="roomCount" label="朝向" width="80" />
+        <el-table-column label="可关联状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 3 ? 'success' : 'warning'" size="small">
-              {{ row.status === 3 ? '可关联' : '待确认' }}
-            </el-tag>
+            <el-tag size="small">可关联</el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -336,7 +365,7 @@
         @current-change="searchProperty" />
       <template #footer>
         <el-button @click="propertyDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmAddProperty">确定添加</el-button>
+        <el-button type="primary" @click="confirmAddProperty">确定添加（{{ propertySelectedIds.length }}套）</el-button>
       </template>
     </el-dialog>
   </div>
@@ -362,59 +391,63 @@ const pageTitle = computed(() => isEdit.value ? '编辑业主' : '新增业主')
 const formData = reactive({
   id: null,
   ownerType: 1,
-  ownerName: '',
+  name: '',
   gender: 1,
-  idCardType: '身份证',
   idCard: '',
   birthDate: null,
-  education: '',
+  nation: '',
+  maritalStatus: null,
+  familyCount: 1,
   occupation: '',
   workUnit: '',
   emergencyContact: '',
   emergencyPhone: '',
-  emergencyRelation: '',
-  enterpriseName: '',
-  creditCode: '',
-  legalPerson: '',
+  emergencyRelation: null,
+  occupancyStatus: 2,
+  enterpriseCreditCode: '',
+  enterpriseType: null,
+  registeredCapital: null,
+  legalPersonName: '',
   legalPersonIdCard: '',
-  enterpriseType: '',
-  registeredCapital: '',
-  establishDate: null,
   contactPerson: '',
-  businessScope: '',
-  registeredAddress: '',
+  contactPosition: '',
+  contactPhone: '',
+  industry: '',
+  enterpriseAddress: '',
   phone: '',
+  backupPhone: '',
   email: '',
   wechat: '',
-  qq: '',
-  address: '',
+  householdAddress: '',
+  currentAddress: '',
   remark: ''
 })
 
 const personalRules = {
-  ownerName: [{ required: true, message: '请输入业主姓名', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入业主姓名', trigger: 'blur' }],
   gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
-  idCardType: [{ required: true, message: '请选择证件类型', trigger: 'change' }],
-  idCard: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
+  idCard: [
+    { required: true, message: '请输入身份证号码', trigger: 'blur' },
+    { pattern: /^\d{17}[\dXx]$/, message: '请输入正确的18位身份证号', trigger: 'blur' }
+  ],
   birthDate: [{ required: true, message: '请选择出生日期', trigger: 'change' }]
 }
 
 const enterpriseRules = {
-  enterpriseName: [{ required: true, message: '请输入企业名称', trigger: 'blur' }],
-  creditCode: [{ required: true, message: '请输入统一社会信用代码', trigger: 'blur' }],
-  legalPerson: [{ required: true, message: '请输入法定代表人', trigger: 'blur' }],
-  contactPerson: [{ required: true, message: '请输入联系人', trigger: 'blur' }]
+  name: [{ required: true, message: '请输入企业名称', trigger: 'blur' }],
+  enterpriseCreditCode: [
+    { required: true, message: '请输入统一社会信用代码', trigger: 'blur' },
+    { len: 18, message: '统一社会信用代码必须为18位', trigger: 'blur' }
+  ],
+  legalPersonName: [{ required: true, message: '请输入法定代表人姓名', trigger: 'blur' }]
 }
 
 const commonRules = {
   phone: [
     { required: true, message: '请输入联系电话', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的11位手机号码', trigger: 'blur' }
   ],
-  email: [
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
-  ],
-  address: [{ required: true, message: '请输入联系地址', trigger: 'blur' }]
+  currentAddress: [{ required: true, message: '请输入现居住/联系地址', trigger: 'blur' }]
 }
 
 const formRules = computed(() => {
@@ -450,23 +483,37 @@ onMounted(() => {
 function loadBuildingList() {
   api.parkBuilding.listAll({ parkId: 1 }).then(res => {
     buildingList.value = res.data || []
-  })
+  }).catch(() => {})
 }
 
 function loadDetail() {
   loading.value = true
   api.parkOwner.getById(route.params.id).then(res => {
     const data = res.data || {}
-    Object.assign(formData, data)
-    selectedProperties.value = data.propertyList?.map(p => ({
-      id: p.id,
+    Object.keys(formData).forEach(key => {
+      if (data[key] !== undefined && data[key] !== null) {
+        formData[key] = data[key]
+      }
+    })
+    formData.id = data.id
+    selectedProperties.value = (data.propertyList || []).map(p => ({
+      id: p.propertyId || p.id,
+      propertyId: p.propertyId,
+      relationId: p.id,
       propertyCode: p.propertyCode,
       buildingName: p.buildingName,
       floorNumber: p.floorNumber,
       buildingArea: p.buildingArea,
-      ownershipRatio: p.ownershipRatio || 100,
-      ownershipType: p.ownershipType || 1
-    })) || []
+      houseType: p.houseType,
+      propertyRightType: p.propertyRightType || 1,
+      propertyRightRatio: p.propertyRightRatio || 100,
+      isSelfOccupy: p.isSelfOccupy !== undefined ? p.isSelfOccupy : 1
+    }))
+    if (data.idCard) {
+      activeStep.value = 2
+    } else if (data.ownerType) {
+      activeStep.value = 1
+    }
   }).finally(() => {
     loading.value = false
   })
@@ -501,12 +548,12 @@ function getStepFields() {
     return null
   } else if (activeStep.value === 1) {
     if (formData.ownerType === 1) {
-      return ['ownerName', 'gender', 'idCardType', 'idCard', 'birthDate']
+      return ['name', 'gender', 'idCard', 'birthDate']
     } else {
-      return ['enterpriseName', 'creditCode', 'legalPerson', 'contactPerson']
+      return ['name', 'enterpriseCreditCode', 'legalPersonName']
     }
   } else if (activeStep.value === 2) {
-    return ['phone', 'address']
+    return ['phone', 'currentAddress']
   }
   return null
 }
@@ -525,10 +572,9 @@ function searchProperty() {
     pageNum: propertyQuery.pageNum,
     pageSize: propertyQuery.pageSize,
     propertyCode: propertyQuery.propertyCode || undefined,
-    buildingId: propertyQuery.buildingId || undefined,
-    unbound: true
+    buildingId: propertyQuery.buildingId || undefined
   }
-  api.parkOwner.getUnboundProperties(params).then(res => {
+  api.property.list(params).then(res => {
     propertyList.value = res.data.list || []
     propertyTotal.value = res.data.total || 0
   })
@@ -548,13 +594,21 @@ function confirmAddProperty() {
     .filter(p => !selectedProperties.value.find(sp => sp.id === p.id))
     .map(p => ({
       id: p.id,
+      propertyId: p.id,
       propertyCode: p.propertyCode,
       buildingName: p.buildingName,
       floorNumber: p.floorNumber,
       buildingArea: p.buildingArea,
-      ownershipRatio: 100,
-      ownershipType: 1
+      houseType: p.houseType,
+      propertyRightType: 1,
+      propertyRightRatio: 100,
+      isSelfOccupy: 1
     }))
+  if (newProperties.length === 0) {
+    ElMessage.info('选择的房产已添加')
+    propertyDialogVisible.value = false
+    return
+  }
   selectedProperties.value.push(...newProperties)
   propertyDialogVisible.value = false
   ElMessage.success(`已添加 ${newProperties.length} 套房产`)
@@ -568,27 +622,31 @@ async function handleSubmit() {
   try {
     await formRef.value.validate()
   } catch {
+    ElMessage.warning('请检查表单是否填写正确')
     return
   }
 
-  const submitData = { 
+  const propertyListData = selectedProperties.value.map(p => ({
+    propertyId: p.propertyId || p.id,
+    propertyRightType: p.propertyRightType,
+    propertyRightRatio: p.propertyRightType === 2 ? p.propertyRightRatio : 100,
+    isSelfOccupy: p.isSelfOccupy
+  }))
+
+  const submitData = {
     ...formData,
-    propertyList: selectedProperties.value.map(p => ({
-      propertyId: p.id,
-      ownershipRatio: p.ownershipRatio,
-      ownershipType: p.ownershipType
-    }))
+    propertyList: propertyListData
   }
 
   if (isEdit.value) {
     api.parkOwner.update(submitData).then(() => {
       ElMessage.success('修改成功')
-      router.back()
+      setTimeout(() => router.back(), 300)
     })
   } else {
     api.parkOwner.add(submitData).then(() => {
       ElMessage.success('新增成功')
-      router.back()
+      setTimeout(() => router.back(), 300)
     })
   }
 }
@@ -614,95 +672,103 @@ function handleBack() {
 }
 
 .form-card {
+  max-width: 1100px;
+  margin: 0 auto;
+
   .card-header {
     font-size: 18px;
     font-weight: bold;
-    color: #303133;
   }
 
   .form-content {
-    padding: 30px 20px;
-  }
-
-  .step-content {
+    padding: 30px 10px 10px 10px;
     min-height: 400px;
-    padding: 20px 0;
+
+    .step-content {
+      padding: 10px 20px;
+    }
+
+    .type-selector {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px 0 60px 0;
+
+      .type-card {
+        width: 280px;
+        padding: 40px 30px;
+        border: 2px solid #e4e7ed;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          border-color: #c6e2ff;
+          background: #f5faff;
+          transform: translateY(-4px);
+        }
+
+        &.active {
+          border-color: #409eff;
+          background: #ecf5ff;
+          box-shadow: 0 6px 20px rgba(64, 158, 255, 0.2);
+        }
+
+        .type-icon {
+          color: #909399;
+          margin-bottom: 16px;
+        }
+
+        &.active .type-icon {
+          color: #409eff;
+        }
+
+        h3 {
+          margin: 0 0 8px 0;
+          color: #303133;
+        }
+
+        p {
+          margin: 0;
+          color: #909399;
+          font-size: 13px;
+        }
+      }
+    }
+
+    .property-select-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ebeef5;
+      font-weight: 600;
+      color: #606266;
+    }
+
+    .empty-tip {
+      padding: 30px;
+      text-align: center;
+      color: #909399;
+      background: #fafafa;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .property-pagination {
+      margin-top: 15px;
+      justify-content: flex-end;
+    }
   }
 
   .form-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding-top: 20px;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px 0;
     border-top: 1px solid #ebeef5;
+    margin-top: 20px;
   }
-}
-
-.type-selector {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  padding: 40px 0;
-
-  .type-card {
-    width: 280px;
-    padding: 40px;
-    border: 2px solid #ebeef5;
-    border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-
-    &:hover {
-      border-color: #c6e2ff;
-      background: #f0f7ff;
-    }
-
-    &.active {
-      border-color: #409EFF;
-      background: #ecf5ff;
-    }
-
-    .type-icon {
-      color: #909399;
-      margin-bottom: 15px;
-    }
-
-    &.active .type-icon {
-      color: #409EFF;
-    }
-
-    h3 {
-      margin: 0 0 10px 0;
-      font-size: 18px;
-      color: #303133;
-    }
-
-    p {
-      margin: 0;
-      font-size: 14px;
-      color: #909399;
-    }
-  }
-}
-
-.property-select-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: #303133;
-}
-
-.property-pagination {
-  margin-top: 15px;
-  text-align: right;
-}
-
-.empty-tip {
-  text-align: center;
-  padding: 40px 0;
-  color: #909399;
 }
 </style>
