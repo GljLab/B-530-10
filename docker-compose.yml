@@ -18,6 +18,8 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
       - ./db/property_init.sql:/docker-entrypoint-initdb.d/02-property_init.sql:ro
       - ./db/property_test_data.sql:/docker-entrypoint-initdb.d/03-property_test_data.sql:ro
+      - ./db/owner_init.sql:/docker-entrypoint-initdb.d/04-owner_init.sql:ro
+      - ./db/owner_test_data.sql:/docker-entrypoint-initdb.d/05-owner_test_data.sql:ro
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
