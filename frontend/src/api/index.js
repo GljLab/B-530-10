@@ -188,6 +188,28 @@ const api = {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     }
+  },
+
+  parkOwner: {
+    list: (params) => request.get('/park/owner/list', { params }),
+    getById: (id) => request.get(`/park/owner/${id}`),
+    add: (data) => request.post('/park/owner', data),
+    update: (data) => request.put('/park/owner', data),
+    delete: (id) => request.delete(`/park/owner/${id}`),
+    audit: (data) => request.post('/park/owner/audit', data),
+    bindProperty: (data) => request.post('/park/owner/bindProperty', data),
+    unbindProperty: (data) => request.post('/park/owner/unbindProperty', data),
+    stats: () => request.get('/park/owner/stats'),
+    getTemplate: () => request.get('/park/owner/template', { responseType: 'blob' }),
+    importData: (file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      return request.post('/park/owner/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    },
+    export: (params) => request.get('/park/owner/export', { params }),
+    getUnboundProperties: () => request.get('/park/property/list')
   }
 }
 

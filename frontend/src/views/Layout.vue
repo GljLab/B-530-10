@@ -56,6 +56,16 @@
             <el-icon><DataLine /></el-icon>
             <span>房产统计</span>
           </el-menu-item>
+          
+          <el-menu-item index="/park/owner" v-if="hasPermission('park:owner:list')">
+            <el-icon><UserFilled /></el-icon>
+            <span>业主管理</span>
+          </el-menu-item>
+          
+          <el-menu-item index="/park/owner/stats" v-if="hasPermission('park:owner:stats')">
+            <el-icon><DataLine /></el-icon>
+            <span>业主统计</span>
+          </el-menu-item>
         </el-sub-menu>
         
         <el-sub-menu index="/system" v-if="hasSystemPermission">
@@ -147,7 +157,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import {
   HomeFilled, Setting, User, Avatar, Menu, Lock,
   Expand, Fold, ArrowDown, SwitchButton,
-  OfficeBuilding, Grid, DataAnalysis, House, DataLine
+  OfficeBuilding, Grid, DataAnalysis, House, DataLine, UserFilled
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -168,7 +178,9 @@ const hasParkPermission = computed(() => {
          hasPermission('park:floor:list') ||
          hasPermission('park:dashboard:list') ||
          hasPermission('park:property:list') ||
-         hasPermission('park:property:stats')
+         hasPermission('park:property:stats') ||
+         hasPermission('park:owner:list') ||
+         hasPermission('park:owner:stats')
 })
 
 const hasSystemPermission = computed(() => {

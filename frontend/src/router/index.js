@@ -71,6 +71,36 @@ const routes = [
         meta: { title: '房产统计', icon: 'DataLine', permission: 'park:property:stats' }
       },
       {
+        path: 'park/owner',
+        name: 'ParkOwner',
+        component: () => import('@/views/owner/OwnerList.vue'),
+        meta: { title: '业主管理', icon: 'UserFilled', permission: 'park:owner:list' }
+      },
+      {
+        path: 'park/owner/add',
+        name: 'ParkOwnerAdd',
+        component: () => import('@/views/owner/OwnerForm.vue'),
+        meta: { title: '新增业主', icon: 'UserFilled', permission: 'park:owner:add', hidden: true }
+      },
+      {
+        path: 'park/owner/edit/:id',
+        name: 'ParkOwnerEdit',
+        component: () => import('@/views/owner/OwnerForm.vue'),
+        meta: { title: '编辑业主', icon: 'UserFilled', permission: 'park:owner:edit', hidden: true }
+      },
+      {
+        path: 'park/owner/detail/:id',
+        name: 'ParkOwnerDetail',
+        component: () => import('@/views/owner/OwnerDetail.vue'),
+        meta: { title: '业主详情', icon: 'UserFilled', permission: 'park:owner:list', hidden: true }
+      },
+      {
+        path: 'park/owner/stats',
+        name: 'ParkOwnerStats',
+        component: () => import('@/views/owner/OwnerStats.vue'),
+        meta: { title: '业主统计', icon: 'DataLine', permission: 'park:owner:stats' }
+      },
+      {
         path: 'park/building/detail/:id',
         name: 'ParkBuildingDetail',
         component: () => import('@/views/park/BuildingDetail.vue'),
